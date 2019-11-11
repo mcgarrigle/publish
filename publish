@@ -3,6 +3,7 @@
 import os
 import codecs
 import markdown
+import yaml
 
 def files():
     f = []
@@ -19,7 +20,11 @@ def main():
 def render(path):
     print(path)
     with codecs.open(path, mode="r", encoding="utf-8") as f:
-        html = markdown.markdown(f.read())
+        text = f.read()
+        (_, header, body) = text.split('---\n')
+        meta = yaml.safe_load(header)
+        print(meta)
+        html = markdown.markdown(body)
         print(html)
 
 if __name__ == '__main__':

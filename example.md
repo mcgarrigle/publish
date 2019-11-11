@@ -1,3 +1,6 @@
+---
+title: a terrible blog
+---
 An example markdown file:
 
 * item
