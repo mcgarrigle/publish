@@ -13,22 +13,22 @@ def files():
             f.append((os.path.join(root, file)))
     return f
 
+def render(path):
+    print(path)
+    with codecs.open('page.html', mode="r", encoding="utf-8") as f:
+        (head, tail) = f.read().split('---')
+    with codecs.open(path, mode="r", encoding="utf-8") as f:
+        (_, header, source) = f.read().split('---\n')
+    meta = yaml.safe_load(header)
+    body = markdown.markdown(source)
+    template = Template(head + body + tail)
+    html = template.render(meta)
+    print(html)
+
 def main():
     sources = [ p for p in files() if p.endswith('.md') ]
     for path in sources:
         render(path)
-
-def render(path):
-    print(path)
-    with codecs.open(path, mode="r", encoding="utf-8") as f:
-        text = f.read()
-        (_, header, body) = text.split('---\n')
-        meta = yaml.safe_load(header)
-        template = Template(body)
-        body = template.render(meta)
-        print(meta)
-        html = markdown.markdown(body)
-        print(html)
 
 if __name__ == '__main__':
     main()
