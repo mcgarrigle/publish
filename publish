@@ -6,6 +6,8 @@ import markdown
 import yaml
 from jinja2 import Template
 
+site = {}
+
 def files():
     f = []
     for (root, dirs, files) in os.walk("."):
@@ -13,19 +15,24 @@ def files():
             f.append((os.path.join(root, file)))
     return f
 
-def render(path):
-    print(path)
+def read_site_config():
+    global site
+    with codecs.open('site.yaml', mode="r", encoding="utf-8") as f:
+        site = yaml.safe_load(f)
     with codecs.open('page.html', mode="r", encoding="utf-8") as f:
-        (head, tail) = f.read().split('---')
+        (site['header'], site['footer']) = f.read().split('---')
+
+def render(path):
     with codecs.open(path, mode="r", encoding="utf-8") as f:
-        (_, header, source) = f.read().split('---\n')
-    meta = yaml.safe_load(header)
+        (_, metadata, source) = f.read().split('---\n')
+    site.update(yaml.safe_load(metadata))
     body = markdown.markdown(source)
-    template = Template(head + body + tail)
-    html = template.render(meta)
+    template = Template(site['header'] + body + site['footer'])
+    html = template.render(site)
     print(html)
 
 def main():
+    read_site_config()
     sources = [ p for p in files() if p.endswith('.md') ]
     for path in sources:
         render(path)
